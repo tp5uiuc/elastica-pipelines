@@ -1,0 +1,14 @@
+{
+  "_output_dir": "/Users/parthas1/code/elastica_pipelines",
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "ElasticaDev",
+  "copyright_year": "2022",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "tp5@illinois.edu",
+  "friendly_name": "Elastica Pipelines",
+  "github_user": "tp5uiuc",
+  "license": "MIT",
+  "package_name": "elastica_pipelines",
+  "project_name": "elastica-pipelines",
+  "version": "0.0.0"
+}
