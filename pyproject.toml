@@ -18,6 +18,7 @@ Changelog = "https://github.com/tp5uiuc/elastica-pipelines/releases"
 [tool.poetry.dependencies]
 python = "^3.7"
 click = ">=8.0.1"
+numpy = ">=1.20.0"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
