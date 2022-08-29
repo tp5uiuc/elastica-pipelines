@@ -5,6 +5,7 @@ from typing import Any
 
 from typing_extensions import Protocol
 
+from .typing import ConcreteRecord
 from .typing import Index
 from .typing import Key
 from .typing import Node
@@ -78,11 +79,11 @@ class RecordTraits(Protocol):
         """Obtains type of a (system) record."""
         ...  # pragma: no cover
 
-    def records_type(self) -> type[Records]:
+    def records_type(self) -> type[Records[ConcreteRecord]]:
         """Obtains type of (system) records."""
         ...  # pragma: no cover
 
-    def slice_type(self) -> type[RecordsSlice]:
+    def slice_type(self) -> type[RecordsSlice[ConcreteRecord]]:
         """Obtains type of (system) records slice."""
         ...  # pragma: no cover
 
@@ -102,6 +103,66 @@ class HasRecordTraits(Protocol):
     """
 
     traits: RecordTraits
+
+
+def record_type(x: HasRecordTraits) -> type[Record]:
+    """Obtain type of a (system) record.
+
+    Args:
+        x: conforming to the HasRecordTraits protocol
+
+    Returns:
+        Record type
+    """
+    return x.traits.record_type()
+
+
+def records_type(x: HasRecordTraits) -> type[Records[ConcreteRecord]]:
+    """Obtain type of (system) records.
+
+    Args:
+        x: conforming to the HasRecordTraits protocol
+
+    Returns:
+        Records type
+    """
+    return x.traits.records_type()
+
+
+def slice_type(x: HasRecordTraits) -> type[RecordsSlice[ConcreteRecord]]:
+    """Obtain type of (system) records slice.
+
+    Args:
+        x: conforming to the HasRecordTraits protocol
+
+    Returns:
+        Record slice type
+    """
+    return x.traits.slice_type()
+
+
+def name(x: HasRecordTraits) -> str:
+    """Obtains the system name.
+
+    Args:
+        x: conforming to the HasRecordTraits protocol
+
+    Returns:
+        Name of the system
+    """
+    return x.traits.name()
+
+
+def index_type(x: HasRecordTraits) -> type[SystemIndex]:
+    """Obtains the type of (system) index.
+
+    Args:
+        x: conforming to the HasRecordTraits protocol
+
+    Returns:
+        System index type.
+    """
+    return x.traits.index_type()
 
 
 class SystemIndex(HasRecordTraits):
