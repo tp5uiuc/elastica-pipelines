@@ -1,5 +1,6 @@
 """Test cases for the __main__ module."""
 import os
+from typing import Type
 
 import pytest
 
@@ -41,15 +42,15 @@ class _Traits:
     def __init__(self) -> None:
         pass
 
-    def record_type(self) -> type[Record]:
+    def record_type(self) -> Type[Record]:
         """Obtains type of a (system) record."""
         return dict
 
-    def records_type(self) -> type[Records[ConcreteRecord]]:
+    def records_type(self) -> Type[Records[ConcreteRecord]]:
         """Obtains type of (system) records."""
         return dict
 
-    def slice_type(self) -> type[RecordsSlice[ConcreteRecord]]:
+    def slice_type(self) -> Type[RecordsSlice[ConcreteRecord]]:
         """Obtains type of (system) records slice."""
         return dict
 
@@ -57,7 +58,7 @@ class _Traits:
         """Obtains the system name."""
         return "_Traits"
 
-    def index_type(self) -> type[SystemIndex]:
+    def index_type(self) -> Type[SystemIndex]:
         """Obtains type of (system) index."""
         return SystemIndex
 
