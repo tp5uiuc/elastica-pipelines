@@ -64,3 +64,6 @@
 - name: wontfix
   description: This will not be worked on
   color: ffffff
+- name: automerge
+  description: Enable automerge commits
+  color: d4c5f9
