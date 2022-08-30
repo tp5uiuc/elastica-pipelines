@@ -18,14 +18,14 @@ F = TypeVar("F", bound=FuncType)
 Key: TypeAlias = Union[int, str]
 Node: TypeAlias = Mapping[str, Any]
 Index: TypeAlias = Union[int, slice]
-Record = TypeVar("Record", bound=Mapping[Key, npt.ArrayLike], covariant=True)
+Record = TypeVar("Record", bound=Mapping[str, npt.ArrayLike], covariant=True)
 
 
 class _R(Generic[Record]):
     pass
 
 
-ConcreteRecord = TypeVar("ConcreteRecord", bound=_R[Mapping[Key, npt.ArrayLike]])
+ConcreteRecord = TypeVar("ConcreteRecord", bound=_R[Mapping[str, npt.ArrayLike]])
 Records: TypeAlias = Mapping[Key, ConcreteRecord]
 RecordsSlice: TypeAlias = Mapping[Key, ConcreteRecord]
 
