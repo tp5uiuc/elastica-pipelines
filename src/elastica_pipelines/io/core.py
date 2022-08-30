@@ -1,6 +1,6 @@
 """Core IO types."""
-from collections.abc import Iterator
 from typing import Any
+from typing import Iterator
 from typing import Mapping
 from typing import Optional
 
