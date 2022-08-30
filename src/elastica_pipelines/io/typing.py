@@ -15,19 +15,21 @@ FuncType: TypeAlias = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
 
 
-Key: TypeAlias = Union[int, str]
+Key: TypeAlias = Union[int, str, slice]
 Node: TypeAlias = Mapping[str, Any]
 Index: TypeAlias = Union[int, slice]
-Record = TypeVar("Record", bound=Mapping[str, npt.ArrayLike], covariant=True)
+RecordConcept = TypeVar(
+    "RecordConcept", bound=Mapping[str, npt.ArrayLike], covariant=True
+)
 
 
-class _R(Generic[Record]):
+class _R(Generic[RecordConcept]):
     pass
 
 
-ConcreteRecord = TypeVar("ConcreteRecord", bound=_R[Mapping[str, npt.ArrayLike]])
-Records: TypeAlias = Mapping[Key, ConcreteRecord]
-RecordsSlice: TypeAlias = Mapping[Key, ConcreteRecord]
+Record: TypeAlias = _R[Mapping[str, npt.ArrayLike]]
+Records = TypeVar("Records", bound=Mapping[Key, Record], covariant=True)
+RecordsSlice = TypeVar("RecordsSlice", bound=Mapping[Key, Record], covariant=True)
 
 
 """Old way of defining types, mypy deficiencies are rampant smh.

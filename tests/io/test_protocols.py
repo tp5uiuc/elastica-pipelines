@@ -6,8 +6,7 @@ import pytest
 
 from elastica_pipelines.io.protocols import ElasticaConvention
 from elastica_pipelines.io.protocols import SystemIndex
-from elastica_pipelines.io.typing import ConcreteRecord
-from elastica_pipelines.io.typing import Record
+from elastica_pipelines.io.typing import RecordConcept
 from elastica_pipelines.io.typing import Records
 from elastica_pipelines.io.typing import RecordsSlice
 
@@ -42,15 +41,15 @@ class _Traits:
     def __init__(self) -> None:
         pass
 
-    def record_type(self) -> Type[Record]:
+    def record_type(self) -> Type[RecordConcept]:
         """Obtains type of a (system) record."""
         return dict
 
-    def records_type(self) -> Type[Records[ConcreteRecord]]:
+    def records_type(self) -> Type[Records]:
         """Obtains type of (system) records."""
         return dict
 
-    def slice_type(self) -> Type[RecordsSlice[ConcreteRecord]]:
+    def slice_type(self) -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
         return dict
 

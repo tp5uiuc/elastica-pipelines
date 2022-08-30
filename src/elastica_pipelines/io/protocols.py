@@ -6,11 +6,10 @@ from typing import Type
 
 from typing_extensions import Protocol
 
-from elastica_pipelines.io.typing import ConcreteRecord
 from elastica_pipelines.io.typing import Index
 from elastica_pipelines.io.typing import Key
 from elastica_pipelines.io.typing import Node
-from elastica_pipelines.io.typing import Record
+from elastica_pipelines.io.typing import RecordConcept
 from elastica_pipelines.io.typing import Records
 from elastica_pipelines.io.typing import RecordsSlice
 
@@ -76,15 +75,15 @@ class RecordTraits(Protocol):
     different Elastica++ systems.
     """
 
-    def record_type(self) -> Type[Record]:
+    def record_type(self) -> Type[RecordConcept]:
         """Obtains type of a (system) record."""
         ...  # pragma: no cover
 
-    def records_type(self) -> Type[Records[ConcreteRecord]]:
+    def records_type(self) -> Type[Records]:
         """Obtains type of (system) records."""
         ...  # pragma: no cover
 
-    def slice_type(self) -> Type[RecordsSlice[ConcreteRecord]]:
+    def slice_type(self) -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
         ...  # pragma: no cover
 
@@ -106,7 +105,7 @@ class HasRecordTraits(Protocol):
     traits: RecordTraits
 
 
-def record_type(x: HasRecordTraits) -> Type[Record]:
+def record_type(x: HasRecordTraits) -> Type[RecordConcept]:
     """Obtain type of a (system) record.
 
     Args:
@@ -118,7 +117,7 @@ def record_type(x: HasRecordTraits) -> Type[Record]:
     return x.traits.record_type()
 
 
-def records_type(x: HasRecordTraits) -> Type[Records[ConcreteRecord]]:
+def records_type(x: HasRecordTraits) -> Type[Records]:
     """Obtain type of (system) records.
 
     Args:
@@ -130,7 +129,7 @@ def records_type(x: HasRecordTraits) -> Type[Records[ConcreteRecord]]:
     return x.traits.records_type()
 
 
-def slice_type(x: HasRecordTraits) -> Type[RecordsSlice[ConcreteRecord]]:
+def slice_type(x: HasRecordTraits) -> Type[RecordsSlice]:
     """Obtain type of (system) records slice.
 
     Args:
