@@ -1,5 +1,6 @@
 """Elastica IO typing."""
 from typing import Any
+from typing import Callable
 from typing import Generic
 from typing import Mapping
 from typing import TypeVar
@@ -7,6 +8,11 @@ from typing import Union
 
 import numpy.typing as npt
 from typing_extensions import TypeAlias
+
+
+# Functional
+FuncType: TypeAlias = Callable[..., Any]
+F = TypeVar("F", bound=FuncType)
 
 
 Key: TypeAlias = Union[int, str]

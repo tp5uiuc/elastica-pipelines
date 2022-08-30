@@ -1,4 +1,4 @@
-"""Test cases for the __main__ module."""
+"""Test cases for IO protocols."""
 import os
 from typing import Type
 
