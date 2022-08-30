@@ -58,6 +58,9 @@ class TestSystemRecord:
         s = SystemRecord(parent_v, sys_id=100)
         # There are only two keys.
         assert len(s) == 2
+        # Add a keys check to ensure mapping works irrespective
+        # of typing or collections.abc
+        assert len(s.keys()) > 0
 
     def test_iter(self, parent_v) -> None:
         """Test iterator.

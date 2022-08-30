@@ -1,8 +1,7 @@
 """Core IO types."""
-
 from collections.abc import Iterator
-from collections.abc import Mapping
 from typing import Any
+from typing import Mapping
 from typing import Optional
 
 import numpy.typing as npt
