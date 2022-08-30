@@ -6,7 +6,7 @@ from typing import Tuple
 import numpy as np
 import numpy.typing as npt
 
-from elastica_pipelines.io.typing import F
+from elastica_pipelines.io.typing import FuncType
 
 
 class Compose:
@@ -22,9 +22,9 @@ class Compose:
         >>> ])
     """
 
-    def __init__(self, transforms: Sequence[F]):
+    def __init__(self, transforms: Sequence[FuncType]):
         """Initializes transforms."""
-        self.transforms: Tuple[F, ...] = tuple(transforms)
+        self.transforms: Tuple[FuncType, ...] = tuple(transforms)
 
     def __call__(self, obj: Any) -> Any:
         """Applies transformation to object.
