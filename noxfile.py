@@ -164,7 +164,8 @@ def mypy(session: Session) -> None:
     args = session.posargs or ["src", "docs/conf.py"]
     session.install(".")
     session.install("mypy", "pytest")
-    session.run("mypy", *args)
+    # https://github.com/python/mypy/issues/5697
+    session.run("mypy", *args, "--no-warn-return-any")
     if not session.posargs:
         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
 
