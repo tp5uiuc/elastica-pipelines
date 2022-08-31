@@ -1,8 +1,10 @@
 """Elastica IO typing."""
+from __future__ import annotations
+
 from typing import Any
 from typing import Callable
-from typing import Generic
 from typing import Mapping
+from typing import Optional
 from typing import TypeVar
 from typing import Union
 
@@ -18,19 +20,33 @@ F = TypeVar("F", bound=FuncType)
 Key: TypeAlias = Union[int, str, slice]
 Node: TypeAlias = Mapping[str, Any]
 Index: TypeAlias = Union[int, slice]
-RecordConcept = TypeVar(
-    "RecordConcept", bound=Mapping[str, npt.ArrayLike], covariant=True
-)
 
 
-class _R(Generic[RecordConcept]):
-    pass
+class _RecordImplementation(Mapping[str, npt.ArrayLike]):
+    def __init__(
+        self, parent: Node, sys_id: int, transforms: Optional[FuncType]  # noqa
+    ) -> None:
+        ...  # pragma: no cover
 
 
-Record: TypeAlias = _R[Mapping[str, npt.ArrayLike]]
-Records = TypeVar("Records", bound=Mapping[Key, Record], covariant=True)
-RecordsSlice = TypeVar("RecordsSlice", bound=Mapping[Key, Record], covariant=True)
+Record: TypeAlias = _RecordImplementation
+RecordLeafs = Union[Record, "RecordsSlice"]
 
+
+class _RecordsImplementation(Mapping[Key, RecordLeafs]):
+    def __init__(self, parent: Node, transforms: Optional[FuncType]) -> None:  # noqa
+        ...  # pragma: no cover
+
+
+Records: TypeAlias = _RecordsImplementation
+
+
+class _RecordSliceImplementation(Mapping[Key, RecordLeafs]):
+    def __init__(self, parent: Records, slice: slice) -> None:  # noqa
+        ...  # pragma: no cover
+
+
+RecordsSlice: TypeAlias = _RecordSliceImplementation
 
 """Old way of defining types, mypy deficiencies are rampant smh.
 # Record: TypeAlias = Mapping[Key, npt.ArrayLike]

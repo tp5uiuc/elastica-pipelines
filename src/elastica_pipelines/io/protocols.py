@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import NoReturn
 from typing import Type
 
 from typing_extensions import Protocol
@@ -9,7 +10,7 @@ from typing_extensions import Protocol
 from elastica_pipelines.io.typing import Index
 from elastica_pipelines.io.typing import Key
 from elastica_pipelines.io.typing import Node
-from elastica_pipelines.io.typing import RecordConcept
+from elastica_pipelines.io.typing import Record
 from elastica_pipelines.io.typing import Records
 from elastica_pipelines.io.typing import RecordsSlice
 
@@ -75,7 +76,7 @@ class RecordTraits(Protocol):
     different Elastica++ systems.
     """
 
-    def record_type(self) -> Type[RecordConcept]:
+    def record_type(self) -> Type[Record]:
         """Obtains type of a (system) record."""
         ...  # pragma: no cover
 
@@ -105,7 +106,45 @@ class HasRecordTraits(Protocol):
     traits: RecordTraits
 
 
-def record_type(x: HasRecordTraits) -> Type[RecordConcept]:
+class _ErrorOutTraits:
+    """Trait that always publishes an error message.
+
+    Meets the ``RecordTraits`` protocol
+    """
+
+    def raise_error(self) -> NoReturn:
+        """Raises user error for accessing raw system record types.
+
+        Raises:
+            TypeError: For accessing types that are not meant to be accessed.
+        """
+        raise TypeError(
+            "Raw system record types are not meant to be accessed."
+            "They must be specialized with a custom traits class first."
+        )
+
+    def record_type(self) -> Type[Record]:
+        """Obtains type of a (system) record."""
+        return self.raise_error()
+
+    def records_type(self) -> Type[Records]:
+        """Obtains type of (system) records."""
+        return self.raise_error()
+
+    def slice_type(self) -> Type[RecordsSlice]:
+        """Obtains type of (system) records slice."""
+        return self.raise_error()
+
+    def name(self) -> str:
+        """Obtains the system name."""
+        self.raise_error()
+
+    def index_type(self) -> Type[SystemIndex]:
+        """Obtains type of (system) index."""
+        return self.raise_error()
+
+
+def record_type(x: HasRecordTraits) -> Type[Record]:
     """Obtain type of a (system) record.
 
     Args:
