@@ -1,12 +1,18 @@
 """Test cases for IO protocols."""
 import os
+from typing import DefaultDict
 from typing import Type
 
 import pytest
 
 from elastica_pipelines.io.protocols import ElasticaConvention
+from elastica_pipelines.io.protocols import HasRecordTraits
 from elastica_pipelines.io.protocols import SystemIndex
-from elastica_pipelines.io.typing import ConcreteRecord
+from elastica_pipelines.io.protocols import index_type
+from elastica_pipelines.io.protocols import name
+from elastica_pipelines.io.protocols import record_type
+from elastica_pipelines.io.protocols import records_type
+from elastica_pipelines.io.protocols import slice_type
 from elastica_pipelines.io.typing import Record
 from elastica_pipelines.io.typing import Records
 from elastica_pipelines.io.typing import RecordsSlice
@@ -46,13 +52,13 @@ class _Traits:
         """Obtains type of a (system) record."""
         return dict
 
-    def records_type(self) -> Type[Records[ConcreteRecord]]:
+    def records_type(self) -> Type[Records]:
         """Obtains type of (system) records."""
         return dict
 
-    def slice_type(self) -> Type[RecordsSlice[ConcreteRecord]]:
+    def slice_type(self) -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
-        return dict
+        return DefaultDict
 
     def name(self) -> str:
         """Obtains the system name."""
@@ -105,7 +111,7 @@ class TestTraits:
         """Test slice type."""
         from elastica_pipelines.io.protocols import slice_type as fun
 
-        assert fun(arg_type) == dict
+        assert fun(arg_type) == DefaultDict
 
     @skip_if_env_has("typeguard")
     @pytest.mark.parametrize("arg_type", [_HasTraits, _HasTraits()])
@@ -122,3 +128,21 @@ class TestTraits:
         from elastica_pipelines.io.protocols import index_type as fun
 
         assert fun(arg_type) == SystemIndex
+
+
+def run_traits_error_test(s: HasRecordTraits) -> None:
+    """Traits error test.
+
+    Args:
+        s : Object with record traits.
+    """
+
+    def test_error(fun):
+        """Tests error based on access."""
+        match = "system record types"
+        with pytest.raises(TypeError, match=match):
+            fun(s)
+        return True
+
+    funs = (record_type, records_type, slice_type, name, index_type)
+    assert all(map(test_error, funs))
