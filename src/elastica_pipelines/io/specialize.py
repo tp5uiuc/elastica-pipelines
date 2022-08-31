@@ -31,7 +31,7 @@ class CosseratRodRecordsSlice(SystemRecordsSlice):
     traits: ClassVar[Type[RecordTraits]]
 
 
-@dataclass(eq=True, frozen=True, slots=True)
+@dataclass(eq=True, frozen=True)
 class CosseratRodRecordIndex(SystemIndices):
     """CosseratRod record index type."""
 
