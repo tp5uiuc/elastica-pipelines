@@ -1,5 +1,6 @@
 """Core IO types."""
 from typing import Any
+from typing import ClassVar
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -10,7 +11,6 @@ from typing import overload
 import numpy.typing as npt
 
 from elastica_pipelines.io.protocols import ElasticaConvention
-from elastica_pipelines.io.protocols import HasRecordTraits
 from elastica_pipelines.io.protocols import RecordTraits
 from elastica_pipelines.io.protocols import _ErrorOutTraits
 from elastica_pipelines.io.protocols import record_type
@@ -104,7 +104,7 @@ def _validate(length: int, index: int) -> int:
 #     ...
 
 
-class SystemRecords(Records, HasRecordTraits):
+class SystemRecords(Records):
     """Base record collection for Elastica++ data-structures.
 
     Is intended to be specialized for different Elastica++ data-stuctures via a traits
@@ -119,7 +119,7 @@ class SystemRecords(Records, HasRecordTraits):
 
     """These traits are not used, but are required to keep the static type-checkers
     quiet."""
-    traits: RecordTraits = _ErrorOutTraits()
+    traits: ClassVar[Type[RecordTraits]] = _ErrorOutTraits
 
     def __init__(self, node: Node, transforms: Optional[FuncType] = None) -> None:
         """Initializer."""
@@ -255,7 +255,7 @@ class RecordsSliceOp:
             return [self.get_index_into_slice(j, length) for j in k]
 
 
-class SystemRecordsSlice(RecordsSlice, HasRecordTraits):
+class SystemRecordsSlice(RecordsSlice):
     """Base class for a slice of io.SystemRecords.
 
     Is intended to be specialized for different Elastica++ data-stuctures via a traits
