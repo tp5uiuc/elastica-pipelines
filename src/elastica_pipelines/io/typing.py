@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 from typing import Callable
+from typing import List
 from typing import Mapping
 from typing import Optional
 from typing import TypeVar
@@ -19,7 +20,7 @@ F = TypeVar("F", bound=FuncType)
 
 Key: TypeAlias = Union[int, str, slice]
 Node: TypeAlias = Mapping[str, Any]
-Index: TypeAlias = Union[int, slice]
+Indices: TypeAlias = Union[int, slice, List[int]]
 
 
 class _RecordImplementation(Mapping[str, npt.ArrayLike]):
@@ -42,7 +43,7 @@ Records: TypeAlias = _RecordsImplementation
 
 
 class _RecordSliceImplementation(Mapping[Key, RecordLeafs]):
-    def __init__(self, parent: Records, slice: slice) -> None:  # noqa
+    def __init__(self, parent: Records, indices: Indices) -> None:  # noqa
         ...  # pragma: no cover
 
 

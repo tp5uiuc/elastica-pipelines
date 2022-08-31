@@ -29,7 +29,7 @@ class SystemRecord(Record):
     class.
 
     Args:
-        parent (node): Parent node in which to lookup the current system record.
+        node (node): Node node in which to lookup the current system record.
         sys_id (int): Unique system id of the record to lookup.
         transforms (callable, optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
@@ -40,11 +40,9 @@ class SystemRecord(Record):
             string based lookup.
     """
 
-    def __init__(
-        self, parent: Node, sys_id: int, transforms: Optional[FuncType] = None
-    ):
+    def __init__(self, node: Node, sys_id: int, transforms: Optional[FuncType] = None):
         """Init."""
-        self.parent = parent
+        self.node = node
         self.sys_id = sys_id
         # Add a lambda to WAR weird mypy bugs
         # access may not be needed for general node types
@@ -54,7 +52,7 @@ class SystemRecord(Record):
 
     def lazy_lookup(self) -> Any:
         """Lazily lookup an Elastica++ data-structure from records."""
-        return self.parent[ElasticaConvention.as_system_key(self.sys_id)]
+        return self.node[ElasticaConvention.as_system_key(self.sys_id)]
 
     def __getitem__(self, k: str) -> npt.ArrayLike:  # noqa
         return self.transforms(self.lazy_lookup()[k])
@@ -71,7 +69,7 @@ def _validate(length: int, index: int) -> int:
 
     Args:
         length (int): Length of data-structure.
-        index (int): Index to be validated.
+        index (int): Indices to be validated.
 
     Returns:
         Validated index satisfying 0 <= ``index`` < ``length``
@@ -107,7 +105,7 @@ class SystemRecords(Records, HasRecordTraits):
     class.
 
     Args:
-        parent (node): Parent node in which to lookup the current system record.
+        node (node): Node node in which to lookup the current system record.
         transforms (callable, optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
@@ -117,23 +115,23 @@ class SystemRecords(Records, HasRecordTraits):
     quiet."""
     traits: RecordTraits = _ErrorOutTraits()
 
-    def __init__(self, parent: Node, transforms: Optional[FuncType] = None) -> None:
+    def __init__(self, node: Node, transforms: Optional[FuncType] = None) -> None:
         """Initializer."""
-        self.parent = parent
+        self.node = node
         self.transforms = transforms
 
     def __iter__(self) -> Iterator[int]:  # noqa
-        for x in self.parent:
+        for x in self.node:
             yield int(x)
 
     def __len__(self) -> int:  # noqa
-        return len(self.parent)
+        return len(self.node)
 
     def __getitem__(self, k: Key) -> Union[Record, RecordsSlice]:  # noqa
         length = len(self)
         if isinstance(k, int):
             rt: Type[Record] = record_type(self)
-            return rt(self.parent, _validate(length, k), self.transforms)
+            return rt(self.node, _validate(length, k), self.transforms)
         elif isinstance(k, slice):
             st: Type[RecordsSlice] = slice_type(self)
             return st(self, slice(*k.indices(length)))
