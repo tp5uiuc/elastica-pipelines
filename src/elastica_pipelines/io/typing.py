@@ -18,7 +18,7 @@ FuncType: TypeAlias = Callable[..., Any]
 F = TypeVar("F", bound=FuncType)
 
 
-Key: TypeAlias = Union[int, str, slice]
+Key: TypeAlias = Union[int, str, List[int], slice]
 Node: TypeAlias = Mapping[str, Any]
 Indices: TypeAlias = Union[int, slice, List[int]]
 

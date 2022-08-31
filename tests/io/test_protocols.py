@@ -130,7 +130,9 @@ class TestTraits:
         assert fun(arg_type) == SystemIndices
 
 
-def run_traits_error_test(s: HasRecordTraits) -> None:
+def run_traits_error_test(
+    s: HasRecordTraits,
+) -> None:
     """Traits error test.
 
     Args:
