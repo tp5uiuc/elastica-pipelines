@@ -7,7 +7,7 @@ import pytest
 
 from elastica_pipelines.io.protocols import ElasticaConvention
 from elastica_pipelines.io.protocols import HasRecordTraits
-from elastica_pipelines.io.protocols import SystemIndex
+from elastica_pipelines.io.protocols import SystemIndices
 from elastica_pipelines.io.protocols import index_type
 from elastica_pipelines.io.protocols import name
 from elastica_pipelines.io.protocols import record_type
@@ -64,9 +64,9 @@ class _Traits:
         """Obtains the system name."""
         return "_Traits"
 
-    def index_type(self) -> Type[SystemIndex]:
+    def index_type(self) -> Type[SystemIndices]:
         """Obtains type of (system) index."""
-        return SystemIndex
+        return SystemIndices
 
 
 def skip_if_env_has(*envs):
@@ -127,10 +127,12 @@ class TestTraits:
         """Test index type."""
         from elastica_pipelines.io.protocols import index_type as fun
 
-        assert fun(arg_type) == SystemIndex
+        assert fun(arg_type) == SystemIndices
 
 
-def run_traits_error_test(s: HasRecordTraits) -> None:
+def run_traits_error_test(
+    s: HasRecordTraits,
+) -> None:
     """Traits error test.
 
     Args:

@@ -7,7 +7,7 @@ from typing import Type
 
 from typing_extensions import Protocol
 
-from elastica_pipelines.io.typing import Index
+from elastica_pipelines.io.typing import Indices
 from elastica_pipelines.io.typing import Key
 from elastica_pipelines.io.typing import Node
 from elastica_pipelines.io.typing import Record
@@ -92,7 +92,7 @@ class RecordTraits(Protocol):
         """Obtains the system name."""
         ...  # pragma: no cover
 
-    def index_type(self) -> Type[SystemIndex]:
+    def index_type(self) -> Type[SystemIndices]:
         """Obtains type of (system) index."""
         ...  # pragma: no cover
 
@@ -139,7 +139,7 @@ class _ErrorOutTraits:
         """Obtains the system name."""
         self.raise_error()
 
-    def index_type(self) -> Type[SystemIndex]:
+    def index_type(self) -> Type[SystemIndices]:
         """Obtains type of (system) index."""
         return self.raise_error()
 
@@ -192,7 +192,7 @@ def name(x: HasRecordTraits) -> str:
     return x.traits.name()
 
 
-def index_type(x: HasRecordTraits) -> Type[SystemIndex]:
+def index_type(x: HasRecordTraits) -> Type[SystemIndices]:
     """Obtains the type of (system) index.
 
     Args:
@@ -204,7 +204,7 @@ def index_type(x: HasRecordTraits) -> Type[SystemIndex]:
     return x.traits.index_type()
 
 
-class SystemIndex(HasRecordTraits):
+class SystemIndices(HasRecordTraits):
     """Protocol for index into data-records."""
 
-    index: Index
+    indices: Indices
