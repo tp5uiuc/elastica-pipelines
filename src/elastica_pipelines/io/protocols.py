@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+from typing import ClassVar
 from typing import NoReturn
 from typing import Type
 
@@ -76,23 +77,28 @@ class RecordTraits(Protocol):
     different Elastica++ systems.
     """
 
-    def record_type(self) -> Type[Record]:
+    @staticmethod
+    def record_type() -> Type[Record]:
         """Obtains type of a (system) record."""
         ...  # pragma: no cover
 
-    def records_type(self) -> Type[Records]:
+    @staticmethod
+    def records_type() -> Type[Records]:
         """Obtains type of (system) records."""
         ...  # pragma: no cover
 
-    def slice_type(self) -> Type[RecordsSlice]:
+    @staticmethod
+    def slice_type() -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
         ...  # pragma: no cover
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Obtains the system name."""
         ...  # pragma: no cover
 
-    def index_type(self) -> Type[SystemIndices]:
+    @staticmethod
+    def index_type() -> Type[SystemIndices]:
         """Obtains type of (system) index."""
         ...  # pragma: no cover
 
@@ -103,7 +109,7 @@ class HasRecordTraits(Protocol):
     Each record type is expected to implement this Protocol.
     """
 
-    traits: RecordTraits
+    traits: ClassVar[Type[RecordTraits]]
 
 
 class _ErrorOutTraits:
@@ -112,7 +118,8 @@ class _ErrorOutTraits:
     Meets the ``RecordTraits`` protocol
     """
 
-    def raise_error(self) -> NoReturn:
+    @staticmethod
+    def raise_error() -> NoReturn:
         """Raises user error for accessing raw system record types.
 
         Raises:
@@ -123,25 +130,30 @@ class _ErrorOutTraits:
             "They must be specialized with a custom traits class first."
         )
 
-    def record_type(self) -> Type[Record]:
+    @staticmethod
+    def record_type() -> Type[Record]:
         """Obtains type of a (system) record."""
-        return self.raise_error()
+        return _ErrorOutTraits.raise_error()
 
-    def records_type(self) -> Type[Records]:
+    @staticmethod
+    def records_type() -> Type[Records]:
         """Obtains type of (system) records."""
-        return self.raise_error()
+        return _ErrorOutTraits.raise_error()
 
-    def slice_type(self) -> Type[RecordsSlice]:
+    @staticmethod
+    def slice_type() -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
-        return self.raise_error()
+        return _ErrorOutTraits.raise_error()
 
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         """Obtains the system name."""
-        self.raise_error()
+        _ErrorOutTraits.raise_error()
 
-    def index_type(self) -> Type[SystemIndices]:
+    @staticmethod
+    def index_type() -> Type[SystemIndices]:
         """Obtains type of (system) index."""
-        return self.raise_error()
+        return _ErrorOutTraits.raise_error()
 
 
 def record_type(x: HasRecordTraits) -> Type[Record]:
