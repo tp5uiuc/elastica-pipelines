@@ -72,3 +72,65 @@ CosseratRodRecord.traits = CosseratRodRecordTraits
 CosseratRodRecords.traits = CosseratRodRecordTraits
 CosseratRodRecordsSlice.traits = CosseratRodRecordTraits
 CosseratRodRecordIndex.traits = CosseratRodRecordTraits
+
+
+# Defines sphere records
+class SphereRecord(SystemRecord):
+    """Sphere record type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class SphereRecords(SystemRecords):
+    """Sphere records type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class SphereRecordsSlice(SystemRecordsSlice):
+    """Sphere records slice type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+@dataclass(eq=True, frozen=True)
+class SphereRecordIndex(SystemIndices):
+    """Sphere record index type."""
+
+    indices: Indices
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class SphereRecordTraits(RecordTraits):
+    """Traits class for Sphere records."""
+
+    @staticmethod
+    def record_type() -> Type[SphereRecord]:
+        """Obtains type of a (system) record."""
+        return SphereRecord
+
+    @staticmethod
+    def records_type() -> Type[SphereRecords]:
+        """Obtains type of (system) records."""
+        return SphereRecords
+
+    @staticmethod
+    def slice_type() -> Type[SphereRecordsSlice]:
+        """Obtains type of (system) records slice."""
+        return SphereRecordsSlice
+
+    @staticmethod
+    def name() -> str:
+        """Obtains the name."""
+        return "Sphere"
+
+    @staticmethod
+    def index_type() -> Type[SphereRecordIndex]:
+        """Obtains type of (system) index."""
+        return SphereRecordIndex
+
+
+SphereRecord.traits = SphereRecordTraits
+SphereRecords.traits = SphereRecordTraits
+SphereRecordsSlice.traits = SphereRecordTraits
+SphereRecordIndex.traits = SphereRecordTraits
