@@ -1,8 +1,12 @@
 """Core IO types."""
+from __future__ import annotations
+
+from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
 from typing import Iterator
 from typing import List
+from typing import Mapping
 from typing import Optional
 from typing import Type
 from typing import Union
@@ -13,6 +17,7 @@ import numpy.typing as npt
 from elastica_pipelines.io.protocols import ElasticaConvention
 from elastica_pipelines.io.protocols import RecordTraits
 from elastica_pipelines.io.protocols import _ErrorOutTraits
+from elastica_pipelines.io.protocols import name
 from elastica_pipelines.io.protocols import record_type
 from elastica_pipelines.io.protocols import slice_type
 from elastica_pipelines.io.transforms import Compose
@@ -68,6 +73,9 @@ class SystemRecord(Record):
 
     def __len__(self) -> int:  # noqa
         return len(self.lazy_lookup())
+
+
+"""Implementation of system-records specific functionality."""
 
 
 def _validate(length: int, index: int) -> int:
@@ -148,6 +156,9 @@ class SystemRecords(Records):
             return self.__getitem__(int(k))
         else:
             raise TypeError(f"Invalid argument type: {type(k)}")
+
+
+"""Implementation of system-slice specific functionality."""
 
 
 class RecordsIndexedOp:
@@ -295,3 +306,57 @@ class SystemRecordsSlice(RecordsSlice):
         else:
             # Parent raises the appropriate error if type is incorrect.
             return self.parent.__getitem__(k)  # type: ignore[unreachable]
+
+
+"""Implementation of snapshot-specific functionality."""
+
+
+@dataclass(eq=True, frozen=True)
+class RecordsAdapterKey:
+    """Key containing both the type and id of the system, for iteration."""
+
+    """Type of the system."""
+    sys_type: str
+    """Unique ID of the system."""
+    sys_id: int
+
+
+class RecordsAdapterIterator:
+    """Iterator for adapted records.
+
+    Args:
+        records (SystemRecords): Records object being adapted.
+    """
+
+    def __init__(self, records: SystemRecords) -> None:  # noqa
+        """Initializer."""
+        self.records = records
+        self.it = iter(records)
+
+    def __iter__(self) -> RecordsAdapterIterator:  # noqa
+        return self
+
+    def __next__(self) -> RecordsAdapterKey:  # noqa
+        return RecordsAdapterKey(name(self.records), next(self.it))
+
+
+class RecordsAdapter(Mapping[RecordsAdapterKey, RecordLeafs]):
+    """Adapts system-records for system-independent iteration.
+
+    Args:
+        records (SystemRecords): Records object being adapted.
+    """
+
+    def __init__(self, records: SystemRecords) -> None:  # noqa
+        self.records = records
+
+    def __iter__(self) -> RecordsAdapterIterator:  # noqa
+        return RecordsAdapterIterator(self.records)
+
+    def __len__(self) -> int:  # noqa
+        return len(self.records)
+
+    def __getitem__(self, k: RecordsAdapterKey) -> RecordLeafs:  # noqa
+        if k.sys_type is not name(self.records):
+            raise KeyError(f"{k.sys_type}")
+        return self.records[k.sys_id]

@@ -3,6 +3,8 @@ from typing import Type
 
 import pytest
 
+from elastica_pipelines.io.core import RecordsAdapter
+from elastica_pipelines.io.core import RecordsAdapterKey
 from elastica_pipelines.io.core import RecordsIndexedOp
 from elastica_pipelines.io.core import RecordsSliceOp
 from elastica_pipelines.io.core import SystemRecord
@@ -98,6 +100,10 @@ class SpecializedTraits(_Traits):
     def slice_type(self) -> Type[RecordsSlice]:
         """Obtains type of (system) records slice."""
         return SystemRecordsSlice
+
+    def name(self) -> str:
+        """Obtains the system name."""
+        return "System"
 
 
 class SpecializedRecords(SystemRecords):
@@ -320,20 +326,21 @@ class TestRecordsSliceOp:
         assert all(map(test_error, error_tests))
 
 
+@pytest.fixture
+def records_v(node_v):
+    """Obtains records from node.
+
+    Args:
+        node_v : The fixture to obtain node.
+
+    Returns:
+        records_v : Specialization of system records.
+    """
+    return SpecializedRecords(node_v)
+
+
 class TestSystemRecordsSlice:
     """Testing SystemRecordsSlice."""
-
-    @pytest.fixture
-    def records_v(self, node_v):
-        """Obtains records from node.
-
-        Args:
-            node_v : The fixture to obtain node.
-
-        Returns:
-            records_v : Specialization of system records.
-        """
-        return SpecializedRecords(node_v)
 
     def test_len(self, records_v) -> None:
         """Test length.
@@ -435,3 +442,59 @@ class TestSystemRecordsSlice:
 
         records = (records_v[[0, 1]], records_v[1:2])
         assert all(map(test_error, records))
+
+
+class TestRecordsAdapter:
+    """Testing RecordsAdapter."""
+
+    def test_len(self, records_v) -> None:
+        """Test length.
+
+        Args:
+            records_v : The fixture to obtain records.
+        """
+        s = RecordsAdapter(records_v)
+        # There are three keys : 0, 1, 2
+        assert len(s) == 3
+        # Add a keys check to ensure mapping works irrespective
+        # of typing or collections.abc
+        assert len(s.keys()) > 0
+
+    def test_iter(self, records_v) -> None:
+        """Test iterator.
+
+        Args:
+            records_v : The fixture to obtain records.
+        """
+        s = RecordsAdapter(records_v)
+        # There are three keys
+        its = iter(s)
+        another_its = iter(its)
+        assert next(its) == RecordsAdapterKey("System", 0)
+        assert next(another_its) == RecordsAdapterKey("System", 1)
+
+        # Test iterator directly via yield
+        for idx, k in enumerate(s):
+            assert k.sys_id == idx
+            assert k.sys_type == "System"
+
+    def test_getitem(self, records_v) -> None:
+        """Getitem test.
+
+        Args:
+            records_v : The fixture to obtain parents.
+        """
+        s = RecordsAdapter(records_v)
+
+        assert s[RecordsAdapterKey("System", 0)] == SystemRecord(records_v.node, 0)
+
+        def test_key_error(k):
+            with pytest.raises(KeyError):
+                s[k]
+            return True
+
+        incorrect_keys = (
+            RecordsAdapterKey("AnotherSystem", 0),  # system name is incorrect
+            RecordsAdapterKey("System", 4),
+        )  # id is incorrect
+        assert all(map(test_key_error, incorrect_keys))
