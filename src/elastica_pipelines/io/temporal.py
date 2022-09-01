@@ -293,19 +293,22 @@ class SeriesSelection(Mapping[SeriesKeys, RecordLeafs]):
         t = type(indices)
         if not isinstance(self.indices, t):
             raise TypeError(
-                f"Requested type {t.__class__.__name__} of system indices does"
+                f"Requested type {t.__class__.__name__} of system indices does "
                 f"not match with the selection{type(self.indices).__class__.__name__}"
             )
+
+        snap = next(iter(self.parent.values()))
+        n_records = len(snap[name(self.indices)])
+
         i = self.indices.indices
+
         op_indices: Union[RecordsIndexedOp, RecordsSliceOp] = (
-            RecordsSliceOp(i)
+            RecordsSliceOp(slice(*i.indices(n_records)))
             if isinstance(i, slice)
             else RecordsIndexedOp([i])
             if isinstance(i, int)
             else RecordsIndexedOp(i)
         )
-        snap = next(iter(self.parent.values()))
-        n_records = len(snap[name(self.indices)])
         return self.parent.temporal_select(
             t(
                 op_indices.get_index_into_slice(
