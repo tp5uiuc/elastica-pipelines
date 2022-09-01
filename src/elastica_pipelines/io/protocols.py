@@ -70,6 +70,22 @@ class ElasticaConvention:
         return n["data"]
 
 
+class BackendAccess(Protocol):
+    """Protocol for backend-dependent data access."""
+
+    @staticmethod
+    def access_time(n: Node) -> float:  # noqa
+        ...  # pragma: no cover
+
+    @staticmethod
+    def access_dt(n: Node) -> float:  # noqa
+        ...  # pragma: no cover
+
+    @staticmethod
+    def access_data(n: Node) -> Any:  # noqa
+        ...  # pragma: no cover
+
+
 class RecordTraits(Protocol):
     """Protocol for a data-record trait instance.
 
