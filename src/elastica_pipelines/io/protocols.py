@@ -236,3 +236,7 @@ class SystemIndices(HasRecordTraits):
     """Protocol for index into data-records."""
 
     indices: Indices
+    traits: ClassVar[Type[RecordTraits]]
+
+    def __init__(self, indices: Indices) -> None:  # noqa
+        ...  # pragma: no cover
