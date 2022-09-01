@@ -16,8 +16,11 @@ from typing_extensions import Protocol
 from typing_extensions import TypeAlias
 
 from elastica_pipelines.io.backends import accessor
+from elastica_pipelines.io.core import RecordsIndexedOp
+from elastica_pipelines.io.core import RecordsSliceOp
 from elastica_pipelines.io.core import SystemRecords
 from elastica_pipelines.io.protocols import ElasticaConvention
+from elastica_pipelines.io.protocols import SystemIndices
 from elastica_pipelines.io.protocols import name
 from elastica_pipelines.io.specialize import CosseratRodRecords
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
@@ -228,7 +231,93 @@ class Series(Mapping[SeriesKeys, Snapshot]):
     def __len__(self) -> int:  # noqa
         return len(self.node)
 
+    def temporal_select(self, indices: SystemIndices) -> SeriesSelection:
+        """Obtain temporal evolution for a select subset of systems.
+
+        Args:
+            indices(SystemIndices): indices (with Traits) for system selection.
+
+        Returns:
+            ``SeriesSelection`` with the same interface.
+        """
+        return SeriesSelection(self, indices)
+
     def iterations(self) -> ItemsView[SeriesKeys, Snapshot]:
+        """Obtain temporal iterations.
+
+        Returns:
+            Temporal iteration
+        """
+        return self.items()
+
+
+class SeriesSelection(Mapping[SeriesKeys, RecordLeafs]):
+    """Temporally evolving data-series restricted to a subset of systems.
+
+    Args:
+        parent (Series): Series from which the selection is made.
+        indices (SystemIndices): Selection of index subsets
+    """
+
+    def __init__(self, parent: Series, indices: SystemIndices):  # noqa
+        """Initializer."""
+        self.parent = parent
+        self.indices = indices
+
+    def __getitem__(self, k: SeriesKeys) -> RecordLeafs:  # noqa
+        # [Time][System][Index]
+        return self.parent[k][name(self.indices)][self.indices.indices]
+
+    def __iter__(self) -> SeriesIterator:  # noqa
+        return iter(self.parent)
+
+    def __len__(self) -> int:  # noqa
+        return len(self.parent)
+
+    def temporal_select(self, indices: SystemIndices) -> SeriesSelection:
+        """Obtain temporal evolution for a select subset of systems.
+
+        Args:
+            indices(SystemIndices): indices (with Traits) for system selection.
+
+        Returns:
+            ``SeriesSelection`` with the same interface.
+
+        Raises:
+            TypeError: If index is out of bounds.
+
+        .. note::
+                The subset of indices requested must be contained within the
+                bounds alredy selected, else an error is thrown.
+        """
+        t = type(indices)
+        if not isinstance(self.indices, t):
+            raise TypeError(
+                f"Requested type {t.__class__.__name__} of system indices does "
+                f"not match with the selection{type(self.indices).__class__.__name__}"
+            )
+
+        snap = next(iter(self.parent.values()))
+        n_records = len(snap[name(self.indices)])
+
+        i = self.indices.indices
+
+        op_indices: Union[RecordsIndexedOp, RecordsSliceOp] = (
+            RecordsSliceOp(slice(*i.indices(n_records)))
+            if isinstance(i, slice)
+            else RecordsIndexedOp([i])
+            if isinstance(i, int)
+            else RecordsIndexedOp(i)
+        )
+        return self.parent.temporal_select(
+            t(
+                op_indices.get_index_into_slice(
+                    indices.indices, op_indices.get_length_of_slice(n_records)
+                )
+            )
+        )
+
+    def iterations(self) -> ItemsView[SeriesKeys, RecordLeafs]:
         """Obtain temporal iterations.
 
         Returns:

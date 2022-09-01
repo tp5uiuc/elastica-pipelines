@@ -8,14 +8,21 @@ import pytest
 
 from elastica_pipelines.io.core import SystemRecord
 from elastica_pipelines.io.protocols import ElasticaConvention
+from elastica_pipelines.io.specialize import CosseratRodRecord
+from elastica_pipelines.io.specialize import CosseratRodRecordIndex
 from elastica_pipelines.io.specialize import CosseratRodRecords
+from elastica_pipelines.io.specialize import CosseratRodRecordsSlice
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
+from elastica_pipelines.io.specialize import SphereRecord
+from elastica_pipelines.io.specialize import SphereRecordIndex
 from elastica_pipelines.io.specialize import SphereRecords
+from elastica_pipelines.io.specialize import SphereRecordsSlice
 from elastica_pipelines.io.specialize import SphereRecordTraits
 from elastica_pipelines.io.temporal import RecordsAdapter
 from elastica_pipelines.io.temporal import RecordsAdapterKey
 from elastica_pipelines.io.temporal import Series
 from elastica_pipelines.io.temporal import SeriesKey
+from elastica_pipelines.io.temporal import SeriesSelection
 from elastica_pipelines.io.temporal import Snapshot
 from elastica_pipelines.io.typing import Node
 from tests.io.test_core import node_v  # noqa : F401
@@ -102,6 +109,11 @@ def snap_node() -> Node:
             "Position": wrap(4.0),
             "Velocity": wrap(6.0),
             "Curvature": wrap(8.0),
+        },
+        ElasticaConvention.as_system_key(2): {
+            "Position": wrap(6.0),
+            "Velocity": wrap(9.0),
+            "Curvature": wrap(12.0),
         },
     }
     sphere_records = {
@@ -200,8 +212,8 @@ class TestSnapshot:
 
         sl = s.systems()
 
-        assert len(sl) == 4  # four systems in total
-        assert list(map(lambda x: x.sys_id, sl.keys())) == [0, 1, 0, 1]
+        assert len(sl) == 5  # four systems in total
+        assert list(map(lambda x: x.sys_id, sl.keys())) == [0, 1, 0, 1, 2]
 
 
 @dataclass
@@ -315,3 +327,159 @@ class TestSeries:
             TestSnapshot().test_iter(snaps.node)
             TestSnapshot().test_mixins(snaps.node)
             # TestSnapshot().test_systems(snaps.node)
+
+
+class TestSeriesSelection:
+    """Test series selection-related functionality."""
+
+    # FIXME : Typeguard fails with a weird NameError not related to the test.
+    @skip_if_env_has("typeguard")
+    def test_getitem(self, series_node) -> None:
+        """Test getitem.
+
+        Args:
+            series_node : The fixture to obtain series node data.
+        """
+        s = Series(series_node)
+        sel = s.temporal_select(CosseratRodRecordIndex(0))
+
+        # temporal
+        assert len(sel) == 3
+
+        sl = sel[50]
+        assert isinstance(sl, CosseratRodRecord)
+        assert sl == CosseratRodRecord(series_node["000050"]["data"]["CosseratRod"], 0)
+
+        sel = s.temporal_select(CosseratRodRecordIndex([1, 2]))
+
+        # temporal
+        assert len(sel) == 3
+
+        sl = sel[50]
+        assert isinstance(sl, CosseratRodRecordsSlice)
+
+        assert sl[0] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 1
+        )
+        assert sl[1] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 2
+        )
+
+        def test_index_error(k):
+            with pytest.raises(IndexError):
+                sl[k]
+            return True
+
+        incorrect_indices = (2, 3, 4)
+        assert all(map(test_index_error, incorrect_indices))
+
+        sel = s.temporal_select(SphereRecordIndex(slice(None, -1, None)))
+        # temporal
+        assert len(sel) == 3
+        sl = sel[50]
+        assert isinstance(sl, SphereRecordsSlice)
+        assert sl[0] == SphereRecord(series_node["000050"]["data"]["Sphere"], 0)
+
+        def test_key_error(k):
+            with pytest.raises(KeyError):
+                sl[k]
+            return True
+
+        incorrect_keys = incorrect_indices
+        assert all(map(test_key_error, incorrect_keys))
+
+    # FIXME : Typeguard fails with a weird NameError not related to the test.
+    @skip_if_env_has("typeguard")
+    def test_iter(self, series_node) -> None:
+        """Test iterator.
+
+        Args:
+            series_node : The fixture to obtain series node data.
+        """
+        series = Series(series_node)
+        s = series.temporal_select(CosseratRodRecordIndex([1, 2]))
+
+        # There are two keys
+        its = iter(s)
+        assert next(its) == SeriesKey(50, 5.0, 0.02)
+        assert next(its) == SeriesKey(100, 10.0, 0.02)
+        assert next(its) == SeriesKey(150, 15.0, 0.02)
+        assert iter(its) == its
+
+    # FIXME : Typeguard fails with a weird NameError not related to the test.
+    @skip_if_env_has("typeguard")
+    def test_iterations(self, series_node) -> None:
+        """Test iterations/items.
+
+        Args:
+            series_node : The fixture to obtain series node data.
+        """
+        series = Series(series_node)
+        s = series.temporal_select(CosseratRodRecordIndex(1))
+
+        for t, rod in s.iterations():
+            assert t.dt == 0.02
+            assert rod["Position"] == 4.0
+
+    # FIXME : Typeguard fails with a weird NameError not related to the test.
+    @skip_if_env_has("typeguard")
+    def test_temporal_select(self, series_node) -> None:
+        """Test iterations/items.
+
+        Args:
+            series_node : The fixture to obtain series node data.
+        """
+        series = Series(series_node)
+        # Selects the slice (1, 2)
+        s = series.temporal_select(CosseratRodRecordIndex(slice(1, None, None)))
+        assert len(s) == 3
+
+        def test_type_error(k):
+            with pytest.raises(TypeError, match="does not match"):
+                s.temporal_select(k)
+            return True
+
+        assert all(
+            map(
+                test_type_error,
+                (
+                    SphereRecordIndex(0),
+                    SphereRecordIndex([0, 1]),
+                    SphereRecordIndex(slice(None, -1, None)),
+                ),
+            )
+        )
+
+        # Selects 1
+        sel = s.temporal_select(CosseratRodRecordIndex(0))
+        assert len(sel) == 3
+        assert isinstance(sel, SeriesSelection)
+
+        sl = sel[50]
+        assert sl == CosseratRodRecord(series_node["000050"]["data"]["CosseratRod"], 1)
+
+        # Selects 0, 1
+        sel = s.temporal_select(CosseratRodRecordIndex([0, 1]))
+        assert len(sel) == 3
+        assert isinstance(sel, SeriesSelection)
+
+        sl = sel[50]
+        assert sl[0] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 1
+        )
+        assert sl[1] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 2
+        )
+
+        # Selects slice(0, 1)
+        sel = s.temporal_select(CosseratRodRecordIndex(slice(None, None, None)))
+        assert len(sel) == 3
+        assert isinstance(sel, SeriesSelection)
+
+        sl = sel[50]
+        assert sl[0] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 1
+        )
+        assert sl[1] == CosseratRodRecord(
+            series_node["000050"]["data"]["CosseratRod"], 2
+        )
