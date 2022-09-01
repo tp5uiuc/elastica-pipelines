@@ -6,14 +6,18 @@ from dataclasses import dataclass
 from typing import Any
 from typing import ChainMap
 from typing import Dict
+from typing import ItemsView
 from typing import Mapping
 from typing import Optional
 from typing import Type
+from typing import Union
 
 from typing_extensions import Protocol
 from typing_extensions import TypeAlias
 
+from elastica_pipelines.io.backends import accessor
 from elastica_pipelines.io.core import SystemRecords
+from elastica_pipelines.io.protocols import ElasticaConvention
 from elastica_pipelines.io.protocols import name
 from elastica_pipelines.io.specialize import CosseratRodRecords
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
@@ -150,3 +154,84 @@ class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
         """
         # map() does not play well with inference.
         return ChainMap(*map(RecordsAdapter, self.values()))  # type: ignore[arg-type]
+
+
+"""Implementation of series functionality."""
+
+
+@dataclass(frozen=True, eq=True)
+class SeriesKey:
+    """Key for a temporal series."""
+
+    iterate: int
+    time: float
+    dt: float
+
+
+class SeriesIterator:
+    """Iterator for adapted records.
+
+    Args:
+        node (Node): Node with series information.
+    """
+
+    def __init__(self, node: Node) -> None:
+        """Initializer."""
+        self.node = node
+        self.it = iter(self.node)
+
+    def __iter__(self) -> SeriesIterator:  # noqa
+        return self
+
+    def __next__(self) -> SeriesKey:  # noqa
+        n = int(next(self.it))
+        record_node = self.node[ElasticaConvention.as_record_key(n)]
+        backend = accessor(record_node)
+        return SeriesKey(
+            n, backend.access_time(record_node), backend.access_dt(record_node)
+        )
+
+
+SeriesKeys: TypeAlias = Union[int, SeriesKey]
+
+
+class Series(Mapping[SeriesKeys, Snapshot]):
+    """Temporally evolving data-series.
+
+    Args:
+        node (Node): Node with series information.
+        transforms (callable, optional): A function/transform that takes in an array
+            data-structure and returns a transformed version.
+            E.g, ``transforms.ToArray``
+    """
+
+    def __init__(self, node: Node, transforms: Optional[FuncType] = None) -> None:
+        """Initializer."""
+        self.node = node
+        self.transforms = transforms
+
+    def __getitem__(self, k: SeriesKeys) -> Snapshot:  # noqa
+        # convention
+        if isinstance(k, int):
+            return Snapshot(
+                ElasticaConvention.access(
+                    self.node[ElasticaConvention.as_record_key(k)]
+                ),
+                self.transforms,
+            )
+        else:
+            return self.__getitem__(k.iterate)
+
+    def __iter__(self) -> SeriesIterator:  # noqa
+        return SeriesIterator(self.node)
+
+    def __len__(self) -> int:  # noqa
+        return len(self.node)
+
+    def iterations(self) -> ItemsView[SeriesKeys, Snapshot]:
+        """Obtain temporal iterations.
+
+        Returns:
+            Temporal iteration
+        """
+        return self.items()
