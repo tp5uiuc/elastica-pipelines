@@ -1,4 +1,6 @@
 """Core IO types."""
+from __future__ import annotations
+
 from typing import Any
 from typing import ClassVar
 from typing import Iterator
@@ -68,6 +70,9 @@ class SystemRecord(Record):
 
     def __len__(self) -> int:  # noqa
         return len(self.lazy_lookup())
+
+
+"""Implementation of system-records specific functionality."""
 
 
 def _validate(length: int, index: int) -> int:
@@ -148,6 +153,9 @@ class SystemRecords(Records):
             return self.__getitem__(int(k))
         else:
             raise TypeError(f"Invalid argument type: {type(k)}")
+
+
+"""Implementation of system-slice specific functionality."""
 
 
 class RecordsIndexedOp:

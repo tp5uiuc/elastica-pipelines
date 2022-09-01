@@ -99,6 +99,10 @@ class SpecializedTraits(_Traits):
         """Obtains type of (system) records slice."""
         return SystemRecordsSlice
 
+    def name(self) -> str:
+        """Obtains the system name."""
+        return "System"
+
 
 class SpecializedRecords(SystemRecords):
     """Specialization of system records."""
@@ -320,20 +324,21 @@ class TestRecordsSliceOp:
         assert all(map(test_error, error_tests))
 
 
+@pytest.fixture
+def records_v(node_v):
+    """Obtains records from node.
+
+    Args:
+        node_v : The fixture to obtain node.
+
+    Returns:
+        records_v : Specialization of system records.
+    """
+    return SpecializedRecords(node_v)
+
+
 class TestSystemRecordsSlice:
     """Testing SystemRecordsSlice."""
-
-    @pytest.fixture
-    def records_v(self, node_v):
-        """Obtains records from node.
-
-        Args:
-            node_v : The fixture to obtain node.
-
-        Returns:
-            records_v : Specialization of system records.
-        """
-        return SpecializedRecords(node_v)
 
     def test_len(self, records_v) -> None:
         """Test length.
