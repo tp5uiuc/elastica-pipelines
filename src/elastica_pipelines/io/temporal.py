@@ -8,9 +8,9 @@ from typing import ChainMap
 from typing import Dict
 from typing import Mapping
 from typing import Optional
-from typing import Protocol
 from typing import Type
 
+from typing_extensions import Protocol
 from typing_extensions import TypeAlias
 
 from elastica_pipelines.io.core import SystemRecords
