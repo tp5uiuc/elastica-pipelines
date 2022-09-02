@@ -3,7 +3,6 @@
 
 import pathlib
 import weakref
-from os import PathLike
 from typing import Optional
 from typing import Union
 
@@ -16,13 +15,14 @@ def _choose_backend(p: pathlib.Path) -> SupportedBackends:
     """Choose backend based on file name.
 
     Args:
-        p(Path) : path of file to choose backend
+        p(Path) : path of file to choose backend.
 
     Returns:
         Supported Backend
 
     Raises:
-        RuntimeError: If backend is unsupported
+        FileNotFoundError: If p does not exist.
+        RuntimeError: If backend is unsupported.
     """
     if not p.exists():
         raise FileNotFoundError(f"File in path {p} not found.")
@@ -39,7 +39,7 @@ def _choose_backend(p: pathlib.Path) -> SupportedBackends:
 def series(
     *,
     file_pattern: Optional[str] = None,
-    metadata: Optional[Union[str, PathLike[str]]] = None,
+    metadata: Optional[Union[str, pathlib.Path]] = None,
     transforms: Optional[FuncType] = None,
 ) -> Series:
     """Make a Series from pattern or metadata file.
@@ -50,6 +50,13 @@ def series(
         transforms (callable, optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
+
+    Returns:
+        Series object with temporal system evolution.
+
+    Raises:
+        RuntimeError: If none or both pattern and metadata is simultaneously specified.
+        NotImplementedError: For pattern-based iteration.
     """
     if not (file_pattern or metadata):
         raise RuntimeError(
