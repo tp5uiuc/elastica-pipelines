@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from elastica_pipelines.io.entry import series
+from tests.io.test_protocols import skip_if_env_has
 
 
 THIS_DIR = Path(__file__).parent
@@ -56,6 +57,8 @@ class TestSeriesEntry:
             file_pattern = "elastica_%T.h5"
             series(file_pattern=file_pattern)
 
+    # Needs Accessor which needs runtime checkable
+    @skip_if_env_has("typeguard")
     def test_series_metadata(self):
         """Tests series with metadata file."""
         metadata_file = THIS_DIR / "data" / "elastica_metadata.h5"
