@@ -41,6 +41,33 @@ $ pip install elastica-pipelines
 
 Please see the [Command-line Reference] for details.
 
+### IO
+
+[![Python3][api-py3]](https://www.python.org/) ![Python3 API: Alpha][dev-alpha]
+
+[api-py3]: https://img.shields.io/badge/language-Python3-yellowgreen "Python3 API"
+[dev-alpha]: https://img.shields.io/badge/phase-alpha-yellowgreen "Status: Alpha"
+
+```py
+from elastica_pipelines import io
+
+# ...
+
+# Read only access to data written by Elastica++
+series = io.series("elastica_metadata.h5")
+
+# use series like a python Mapping
+for t, records in series.iterations():
+    print("Iteration: {0} at time {1}".format(t.iteration, t.time))
+
+    # Records contain systems such as CosseratRods, Spheres which
+    # are also python Mapping
+    for uuid, rod in records.cosserat_rods().items():
+        print("  Rod '{0}' attributes:".format(uuid))
+        # even rod is a Mapping
+        print("  {0}".format(rod.keys()))
+```
+
 ## Contributing
 
 Contributions are very welcome.

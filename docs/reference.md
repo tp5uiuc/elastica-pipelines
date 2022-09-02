@@ -6,3 +6,7 @@
 .. automodule:: elastica_pipelines
    :members:
 ```
+
+```{include} ./api/io.md
+
+```
