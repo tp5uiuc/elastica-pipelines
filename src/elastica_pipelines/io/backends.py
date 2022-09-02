@@ -1,5 +1,6 @@
 """IO backends."""
 
+from enum import Enum
 from typing import Any
 from typing import Type
 
@@ -45,6 +46,12 @@ class HDF5Access:
             Data from HDF5 node
         """
         return n["data"]
+
+
+class SupportedBackends(Enum):
+    """Supported IO Backends."""
+
+    HDF5 = 1
 
 
 def accessor(n: Node) -> Type[BackendAccess]:
