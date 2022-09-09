@@ -124,7 +124,7 @@ class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
 
     Args:
         node (node): Node in which to lookup the temporal information.
-        transforms (callable, optional): A function/transform that takes in an array
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
     """
@@ -202,8 +202,8 @@ class Series(Mapping[SeriesKeys, Snapshot]):
     """Temporally evolving data-series.
 
     Args:
-        node (Node): Node with series information.
-        transforms (callable, optional): A function/transform that takes in an array
+        node : Node with series information.
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
     """

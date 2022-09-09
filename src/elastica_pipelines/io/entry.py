@@ -45,9 +45,9 @@ def series(
     """Make a Series from pattern or metadata file.
 
     Args:
-        file_pattern (str, optional): Naming pattern of time-series files.
-        metadata (str, optional): Metadata file.
-        transforms (callable, optional): A function/transform that takes in an array
+        file_pattern (str, Optional): Naming pattern of time-series files.
+        metadata (str, Optional): Metadata file.
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
 

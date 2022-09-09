@@ -37,7 +37,7 @@ class SystemRecord(Record):
     Args:
         node (node): Node node in which to lookup the current system record.
         sys_id (int): Unique system id of the record to lookup.
-        transforms (callable, optional): A function/transform that takes in an array
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
 
@@ -117,7 +117,7 @@ class SystemRecords(Records):
 
     Args:
         node (node): Node node in which to lookup the current system record.
-        transforms (callable, optional): A function/transform that takes in an array
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
     """
