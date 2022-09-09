@@ -142,17 +142,30 @@ def precommit(session: Session) -> None:
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     requirements = session.poetry.export_requirements()
+    # Vulnerabilities with numpy 1.21 needed for Python 3.7 support
+    ignored = (
+        44715,
+        44716,
+        44717,
+    )
     session.install("safety")
-    session.run("safety", "check", "--full-report", f"--file={requirements}")
+    session.run(
+        "safety",
+        "check",
+        "--full-report",
+        f"--file={requirements}",
+        *map(lambda x: f"--ignore={x}", ignored),
+    )
 
 
 @session(python=python_versions)
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
-    args = session.posargs or ["src", "tests", "docs/conf.py"]
+    args = session.posargs or ["src", "docs/conf.py"]
     session.install(".")
     session.install("mypy", "pytest")
-    session.run("mypy", *args)
+    # https://github.com/python/mypy/issues/5697
+    session.run("mypy", *args, "--no-warn-return-any")
     if not session.posargs:
         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
 
@@ -187,7 +200,12 @@ def typeguard(session: Session) -> None:
     """Runtime type checking using Typeguard."""
     session.install(".")
     session.install("pytest", "typeguard", "pygments")
-    session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
+    session.run(
+        "pytest",
+        f"--typeguard-packages={package}",
+        *session.posargs,
+        env={"ENVIRONMENT": "typeguard"},
+    )
 
 
 @session(python=python_versions)
