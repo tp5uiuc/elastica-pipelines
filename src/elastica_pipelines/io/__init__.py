@@ -5,10 +5,10 @@ __all__ = [
     "protocols",
     "specialize",
     "temporal",
-    "transforms, " "typing",
+    "transforms",
+    "typing",
 ]
 
 from elastica_pipelines.io.entry import series  # noqa
 from elastica_pipelines.io.specialize import CosseratRodRecordIndex  # noqa
 from elastica_pipelines.io.specialize import SphereRecordIndex  # noqa
-from elastica_pipelines.io.temporal import Series  # noqa
