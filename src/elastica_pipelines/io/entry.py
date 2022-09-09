@@ -45,14 +45,20 @@ def series(
     """Make a Series from pattern or metadata file.
 
     Args:
-        file_pattern (str, optional): Naming pattern of time-series files.
-        metadata (str, optional): Metadata file.
-        transforms (callable, optional): A function/transform that takes in an array
+        file_pattern (str, Optional): Naming pattern of time-series files.
+        metadata : Metadata file.
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
 
     Returns:
         Series object with temporal system evolution.
+
+    Example:
+        >>> from elastica_pipelines.io import series
+        >>> metadata_fn = "tests/io/data/elastica_metadata.h5"
+        >>> for t, snapshot in series(metadata=metadata_fn).iterations():
+        >>>     print("Iteration: {0} at time {1}".format(t.iterate, t.time))
 
     Raises:
         RuntimeError: If none or both pattern and metadata is simultaneously specified.

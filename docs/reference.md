@@ -1,8 +1,5 @@
 # Reference
 
-## elastica_pipelines
+```{include} api/io.md.include
 
-```{eval-rst}
-.. automodule:: elastica_pipelines
-   :members:
 ```

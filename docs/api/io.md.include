@@ -1,0 +1,73 @@
+## IO
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io
+
+.. autofunction:: series
+
+```
+
+### Temporal
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.temporal
+
+.. autoclass:: Series
+   :members:
+
+.. autoclass:: SeriesKey
+
+.. class:: SeriesKeys
+
+   Union of integer and SeriesKey
+
+.. autoclass:: SeriesSelection
+   :members:
+
+.. autoclass:: Snapshot
+   :members:
+
+   .. method:: spheres
+
+   		Access sphere records
+
+   .. method:: cosserat_rods
+
+   		Access cosserat rod records
+
+.. autoclass:: RecordsAdapterKey
+   :members:
+
+```
+
+### Transforms
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.transforms
+
+.. autoclass:: Compose
+.. autoclass:: ToArray
+
+```
+
+### Protocols
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.protocols
+
+.. autoclass:: SystemIndices
+
+```
+
+### Typing
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.typing
+
+.. class:: Node
+
+   Mapping from a string to any.
+
+.. class:: RecordLeafs
+
+   Record objects that can be queried for physical data.
+```

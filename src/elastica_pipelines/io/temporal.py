@@ -36,11 +36,15 @@ from elastica_pipelines.io.typing import RecordLeafs
 
 @dataclass(eq=True, frozen=True)
 class RecordsAdapterKey:
-    """Key containing both the type and id of the system, for iteration."""
+    """Key containing both the type and id of the system, for iteration.
 
-    """Type of the system."""
+    Args:
+        sys_type: Type of the system.
+        sys_id: Unique ID of the system.
+
+    """
+
     sys_type: str
-    """Unique ID of the system."""
     sys_id: int
 
 
@@ -123,10 +127,24 @@ class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
     """Data access for a single snapshot of an Elastica++ simulation.
 
     Args:
-        node (node): Node in which to lookup the temporal information.
-        transforms (callable, optional): A function/transform that takes in an array
+        node : Node in which to lookup the information at one time iterate.
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
+
+    Example:
+        >>> from elastica_pipelines.io import series
+        >>> from elastica_pipelines.io.temporal import Snapshot
+        >>>
+        >>> # ``series`` returns a ``Series`` object
+        >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+        >>> s = series(metadata=metadata_filename)
+
+        >>> snap : Snapshot = s[50] # lookup the data at iteration 50
+
+        >>> cosserat_rod_records = snap["CosseratRod"] # dict-like interface
+        >>> for system_type in snap.keys(): # obtain all system types
+        >>>     print(system_type, snap[system_type])
     """
 
     def __init__(self, node: Node, transforms: Optional[FuncType] = None) -> None:
@@ -154,6 +172,19 @@ class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
 
         Returns:
             Records across all systems.
+
+        Example:
+            >>> from elastica_pipelines.io import series
+            >>> from elastica_pipelines.io.temporal import Snapshot
+            >>>
+            >>> # ``series`` returns a ``Series`` object
+            >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+            >>> s = series(metadata=metadata_filename)
+            >>> snap : Snapshot = s[50] # lookup the data at iteration 50
+
+            >>> # Iterate over all systems regardless of the type
+            >>> for sys_id, system in snap.systems().items():
+            >>>     print(sys_id, system)
         """
         # map() does not play well with inference.
         return ChainMap(*map(RecordsAdapter, self.values()))  # type: ignore[arg-type]
@@ -164,7 +195,14 @@ class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
 
 @dataclass(frozen=True, eq=True)
 class SeriesKey:
-    """Key for a temporal series."""
+    """Key for a temporal series.
+
+    Args:
+        iterate: Unique iteration value
+        time: Time for current iteration
+        dt: Timestep for current iteration
+
+    """
 
     iterate: int
     time: float
@@ -201,11 +239,27 @@ SeriesKeys: TypeAlias = Union[int, SeriesKey]
 class Series(Mapping[SeriesKeys, Snapshot]):
     """Temporally evolving data-series.
 
+    Has the same interface as a dictionary, and hence lookup, items() work.
+
     Args:
-        node (Node): Node with series information.
-        transforms (callable, optional): A function/transform that takes in an array
+        node : Node with series information.
+        transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
+
+    Example:
+        >>> from elastica_pipelines.io import series
+        >>> from elastica_pipelines.io.temporal import Series
+        >>>
+        >>> # ``series`` returns a ``Series`` object
+        >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+        >>> s : Series = series(metadata=metadata_filename)
+
+        >>> s[50] # lookup the data at iteration 50, iterates may not be continuous!
+
+        >>> for t in s.keys(): # obtain all iteration values
+        >>>     print(t.iterate, t.time, t.dt)
+        >>>     print(s[t])
     """
 
     def __init__(self, node: Node, transforms: Optional[FuncType] = None) -> None:
@@ -239,6 +293,26 @@ class Series(Mapping[SeriesKeys, Snapshot]):
 
         Returns:
             ``SeriesSelection`` with the same interface.
+
+        Example:
+            >>> from elastica_pipelines.io import series
+            >>> from elastica_pipelines.io.temporal import Series
+            >>> from elastica_pipelines.io import CosseratRodRecordIndex
+            >>>
+            >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+            >>> s : Series = series(metadata=metadata_filename)
+            >>>
+            >>> # Select Cosserat rod with ID 1
+            >>> subset = s.temporal_select(CosseratRodRecordIndex(1))
+            >>> # Select Cosserat rod with list of indices
+            >>> subset = s.temporal_select(CosseratRodRecordIndex([1, 3]))
+            >>> # Select Cosserat rod range with indices
+            >>> subset = s.temporal_select(CosseratRodRecordIndex(slice(1,5,2)))
+            >>>
+            >>> # Subset has same interface as Series, see SeriesSelection
+            >>> for t in subset.keys(): # obtain all iteration values
+            >>>     print(t.iterate, t.time, t.dt)
+            >>>     print(subset[t])
         """
         return SeriesSelection(self, indices)
 
@@ -257,6 +331,24 @@ class SeriesSelection(Mapping[SeriesKeys, RecordLeafs]):
     Args:
         parent (Series): Series from which the selection is made.
         indices (SystemIndices): Selection of index subsets
+
+    Example:
+        >>> from elastica_pipelines.io import series
+        >>> from elastica_pipelines.io.temporal import Series, SeriesSelection
+        >>> from elastica_pipelines.io import CosseratRodRecordIndex as RodIndex
+        >>>
+        >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+        >>> s : Series = series(metadata=metadata_filename)
+        >>>
+        >>> # Select Cosserat rod with list of indices
+        >>> subset : SeriesSelection = s.temporal_select(RodIndex([1, 4, 9]))
+        >>>
+        >>> # Subset has same interface as Series
+        >>> subset[50] # lookup the data at iteration 50
+        >>>
+        >>> for t in subset.keys(): # obtain all iteration values for subsets
+        >>>     print(t.iterate, t.time, t.dt)
+        >>>     print(subset[t])
     """
 
     def __init__(self, parent: Series, indices: SystemIndices):  # noqa
@@ -285,6 +377,26 @@ class SeriesSelection(Mapping[SeriesKeys, RecordLeafs]):
 
         Raises:
             TypeError: If index is out of bounds.
+
+        Example:
+            >>> from elastica_pipelines.io import series
+            >>> from elastica_pipelines.io.temporal import Series, SeriesSelection
+            >>> from elastica_pipelines.io import CosseratRodRecordIndex as RodIndex
+            >>>
+            >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+            >>> ser : Series = series(metadata=metadata_filename)
+            >>>
+            >>> s : SeriesSelection = ser.temporal_select(RodIndex([1, 2, 3]))
+            >>>
+            >>> # Select Cosserat rod with list of indices
+            >>> subset : SeriesSelection = s.temporal_select(RodIndex([1, 2]))
+            >>>
+            >>> # Subset has same interface as Series
+            >>> subset[50] # lookup the data at iteration 50
+            >>>
+            >>> for t in subset.keys(): # obtain all iteration values for subsets
+            >>>     print(t.iterate, t.time, t.dt)
+            >>>     print(subset[t])
 
         .. note::
                 The subset of indices requested must be contained within the
