@@ -1,0 +1,35 @@
+## IO
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io
+
+.. autofunction:: series
+
+```
+
+### Temporal
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.temporal
+
+.. autoclass:: Series
+```
+
+### Transforms
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.transforms
+
+.. autoclass:: Compose
+.. autoclass:: ToArray
+
+```
+
+### Typing
+
+```{eval-rst}
+.. automodule:: elastica_pipelines.io.typing
+
+.. class:: Node
+
+   Mapping from a string to any.
+```
