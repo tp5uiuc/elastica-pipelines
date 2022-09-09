@@ -46,13 +46,19 @@ def series(
 
     Args:
         file_pattern (str, Optional): Naming pattern of time-series files.
-        metadata (str, Optional): Metadata file.
+        metadata : Metadata file.
         transforms (Callable, Optional): A function/transform that takes in an array
             data-structure and returns a transformed version.
             E.g, ``transforms.ToArray``
 
     Returns:
         Series object with temporal system evolution.
+
+    Example:
+        >>> from elastica_pipelines.io import series
+        >>>
+        >>> for t, snapshot in series(metadata="elastica_metadata.h5").iterations():
+        >>>     print("Iteration: {0} at time {1}".format(t.iterate, t.time))
 
     Raises:
         RuntimeError: If none or both pattern and metadata is simultaneously specified.
