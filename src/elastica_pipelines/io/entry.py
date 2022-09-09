@@ -56,8 +56,8 @@ def series(
 
     Example:
         >>> from elastica_pipelines.io import series
-        >>>
-        >>> for t, snapshot in series(metadata="elastica_metadata.h5").iterations():
+        >>> metadata_fn = "tests/io/data/elastica_metadata.h5"
+        >>> for t, snapshot in series(metadata=metadata_fn).iterations():
         >>>     print("Iteration: {0} at time {1}".format(t.iterate, t.time))
 
     Raises:
