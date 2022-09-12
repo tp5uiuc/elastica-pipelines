@@ -15,6 +15,7 @@ maxdepth: 1
 ---
 
 usage
+examples
 reference
 contributing
 Code of Conduct <codeofconduct>
