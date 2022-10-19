@@ -43,7 +43,7 @@ class ElasticaConvention:
     @staticmethod
     def len_record_key() -> int:
         """Length of a record key used internally by Elastica++."""
-        return 6
+        return 10
 
     @staticmethod
     def as_record_key(k: Key) -> str:

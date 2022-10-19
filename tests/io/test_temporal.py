@@ -317,17 +317,23 @@ class TestSeries:
 
         sl = s[50]
         assert isinstance(sl, Snapshot)
-        assert sl == Snapshot(series_node["000050"]["data"])
+        assert sl == Snapshot(
+            series_node[ElasticaConvention.as_record_key("000050")]["data"]
+        )
 
         sl = s[100]
         assert isinstance(sl, Snapshot)
-        assert sl == Snapshot(series_node["000100"]["data"])
+        assert sl == Snapshot(
+            series_node[ElasticaConvention.as_record_key("000100")]["data"]
+        )
 
         # Getitem test with SeriesKey
         k = SeriesKey(100, 10.0, 0.02)
         sl = s[k]
         assert isinstance(sl, Snapshot)
-        assert sl == Snapshot(series_node["000100"]["data"])
+        assert sl == Snapshot(
+            series_node[ElasticaConvention.as_record_key("000100")]["data"]
+        )
 
     def test_transforms(self, series_node) -> None:
         """Test transformation.
@@ -343,7 +349,10 @@ class TestSeries:
 
         sl = s[50]
         assert isinstance(sl, Snapshot)
-        assert sl == Snapshot(series_node["000050"]["data"], transforms=trafo)
+        assert sl == Snapshot(
+            series_node[ElasticaConvention.as_record_key("000050")]["data"],
+            transforms=trafo,
+        )
 
     # FIXME : Typeguard fails with a weird NameError not related to the test.
     @skip_if_env_has("typeguard")
@@ -399,7 +408,12 @@ class TestSeriesSelection:
 
         sl = sel[50]
         assert isinstance(sl, CosseratRodRecord)
-        assert sl == CosseratRodRecord(series_node["000050"]["data"]["CosseratRod"], 0)
+        assert sl == CosseratRodRecord(
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            0,
+        )
 
         # Test without damping
         sel = s.temporal_select(CosseratRodWithoutDampingRecordIndex([0, 1]))
@@ -410,10 +424,16 @@ class TestSeriesSelection:
         sl = sel[50]
         assert isinstance(sl, CosseratRodWithoutDampingRecordsSlice)
         assert sl[0] == CosseratRodWithoutDampingRecord(
-            series_node["000050"]["data"]["CosseratRodWithoutDamping"], 0
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRodWithoutDamping"
+            ],
+            0,
         )
         assert sl[1] == CosseratRodWithoutDampingRecord(
-            series_node["000050"]["data"]["CosseratRodWithoutDamping"], 1
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRodWithoutDamping"
+            ],
+            1,
         )
 
         sel = s.temporal_select(CosseratRodRecordIndex([1, 2]))
@@ -425,10 +445,16 @@ class TestSeriesSelection:
         assert isinstance(sl, CosseratRodRecordsSlice)
 
         assert sl[0] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 1
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            1,
         )
         assert sl[1] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 2
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            2,
         )
 
         def test_index_error(k):
@@ -444,7 +470,9 @@ class TestSeriesSelection:
         assert len(sel) == 3
         sl = sel[50]
         assert isinstance(sl, SphereRecordsSlice)
-        assert sl[0] == SphereRecord(series_node["000050"]["data"]["Sphere"], 0)
+        assert sl[0] == SphereRecord(
+            series_node[ElasticaConvention.as_record_key("000050")]["data"]["Sphere"], 0
+        )
 
         def test_key_error(k):
             with pytest.raises(KeyError):
@@ -522,7 +550,12 @@ class TestSeriesSelection:
         assert isinstance(sel, SeriesSelection)
 
         sl = sel[50]
-        assert sl == CosseratRodRecord(series_node["000050"]["data"]["CosseratRod"], 1)
+        assert sl == CosseratRodRecord(
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            1,
+        )
 
         # Selects 0, 1
         sel = s.temporal_select(CosseratRodRecordIndex([0, 1]))
@@ -531,10 +564,16 @@ class TestSeriesSelection:
 
         sl = sel[50]
         assert sl[0] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 1
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            1,
         )
         assert sl[1] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 2
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            2,
         )
 
         # Selects slice(0, 1)
@@ -544,8 +583,14 @@ class TestSeriesSelection:
 
         sl = sel[50]
         assert sl[0] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 1
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            1,
         )
         assert sl[1] == CosseratRodRecord(
-            series_node["000050"]["data"]["CosseratRod"], 2
+            series_node[ElasticaConvention.as_record_key("000050")]["data"][
+                "CosseratRod"
+            ],
+            2,
         )
