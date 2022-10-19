@@ -238,6 +238,21 @@ class TestSnapshot:
 
     # FIXME : Typeguard fails with a weird NameError not related to the test.
     @skip_if_env_has("typeguard")
+    def test_rods(self, snap_node) -> None:
+        """Test rods() call.
+
+        Args:
+            snap_node : The fixture to obtain node data.
+        """
+        s = Snapshot(snap_node)
+
+        sl = s.rods()
+
+        assert len(sl) == (3 + 3)  # Two cosserat rod types
+        assert list(map(lambda x: x.sys_id, sl.keys())) == [0, 1, 2, 0, 1, 2]
+
+    # FIXME : Typeguard fails with a weird NameError not related to the test.
+    @skip_if_env_has("typeguard")
     def test_systems(self, snap_node) -> None:
         """Test systems() call.
 
