@@ -26,3 +26,12 @@ for t, snapshot in series.iterations():
             print(f"  {list(rod.keys())}")
         # and then access it values.
         print(f"  Rod '{rod_id}' position:", rod["Position"])
+
+    # To access all rod types (CosseratRod, CosseratRodWithoutDamping etc.),
+    # use the rods() method
+    for (
+        rod_id,
+        rod,
+    ) in snapshot.rods().items():
+        # and then access it values.
+        print(f"  Rod '{rod_id}' position:", rod["Position"])

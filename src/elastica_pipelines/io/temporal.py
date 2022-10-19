@@ -136,13 +136,55 @@ class SphereRecordsMixin:
         return self.__getitem__(SphereRecordTraits.name())
 
 
+class HasItems(HasGetItem, Protocol):
+    """Has items protocol."""
+
+    def items(self) -> Any:  # noqa
+        ...  # pragma: no cover
+
+
+class RodRecordsMixin(CosseratRodRecordsMixin, CosseratRodWithoutDampingRecordsMixin):
+    """Mixin for rods() access."""
+
+    def rods(self: HasItems) -> ChainMap[RecordsAdapterKey, RecordLeafs]:
+        """Access all rod records.
+
+        Returns:
+            Records across all rods.
+
+        Example:
+            >>> from elastica_pipelines.io import series
+            >>> from elastica_pipelines.io.temporal import Snapshot
+            >>>
+            >>> # ``series`` returns a ``Series`` object
+            >>> metadata_filename = "tests/io/data/elastica_metadata.h5"
+            >>> s = series(metadata=metadata_filename)
+            >>> snap : Snapshot = s[50] # lookup the data at iteration 50
+
+            >>> # Iterate over all rods regardless of the type
+            >>> for sys_id, system in snap.rods().items():
+            >>>     print(sys_id, system)
+        """
+        # map() does not play well with type inference.
+        return ChainMap(
+            *map(  # type: ignore[arg-type]
+                RecordsAdapter,
+                map(
+                    lambda y: y[1],  # Extract only values
+                    filter(  # Filter based on keys
+                        lambda x: CosseratRodRecordTraits.name() in x[0], self.items()
+                    ),
+                ),
+            )
+        )
+
+
 RecordsMap: TypeAlias = Mapping[str, SystemRecords]
 
 
 class Snapshot(
     RecordsMap,
-    CosseratRodRecordsMixin,
-    CosseratRodWithoutDampingRecordsMixin,
+    RodRecordsMixin,
     SphereRecordsMixin,
 ):
     """Data access for a single snapshot of an Elastica++ simulation.
