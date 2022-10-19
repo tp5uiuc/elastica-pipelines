@@ -9,6 +9,7 @@ from elastica_pipelines.io.protocols import record_type
 from elastica_pipelines.io.protocols import records_type
 from elastica_pipelines.io.protocols import slice_type
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecordTraits
 from elastica_pipelines.io.specialize import SphereRecordTraits
 
 
@@ -35,6 +36,15 @@ class TestCosseratRodTraits:
     def test_traits_presence(self):
         """Test presence of traits class in all CosseratRod specializations."""
         traits = CosseratRodRecordTraits
+        run_traits_presence_test(traits)
+
+
+class TestCosseratRodWithoutDampingTraits:
+    """Tests CosseratRodWithoutDamping Traits."""
+
+    def test_traits_presence(self):
+        """Test presence of traits class in WithoutDamping specialization."""
+        traits = CosseratRodWithoutDampingRecordTraits
         run_traits_presence_test(traits)
 
 

@@ -74,6 +74,68 @@ CosseratRodRecordsSlice.traits = CosseratRodRecordTraits
 CosseratRodRecordIndex.traits = CosseratRodRecordTraits
 
 
+# Defines cosserat-rod records
+class CosseratRodWithoutDampingRecord(SystemRecord):
+    """CosseratRodWithoutDamping record type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class CosseratRodWithoutDampingRecords(SystemRecords):
+    """CosseratRodWithoutDamping records type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class CosseratRodWithoutDampingRecordsSlice(SystemRecordsSlice):
+    """CosseratRodWithoutDamping records slice type."""
+
+    traits: ClassVar[Type[RecordTraits]]
+
+
+@dataclass(eq=True, frozen=True)
+class CosseratRodWithoutDampingRecordIndex(SystemIndices):
+    """CosseratRodWithoutDamping record index type."""
+
+    indices: Indices
+    traits: ClassVar[Type[RecordTraits]]
+
+
+class CosseratRodWithoutDampingRecordTraits(RecordTraits):
+    """Traits class for CosseratRodWithoutDamping records."""
+
+    @staticmethod
+    def record_type() -> Type[CosseratRodWithoutDampingRecord]:
+        """Obtains type of a (system) record."""
+        return CosseratRodWithoutDampingRecord
+
+    @staticmethod
+    def records_type() -> Type[CosseratRodWithoutDampingRecords]:
+        """Obtains type of (system) records."""
+        return CosseratRodWithoutDampingRecords
+
+    @staticmethod
+    def slice_type() -> Type[CosseratRodWithoutDampingRecordsSlice]:
+        """Obtains type of (system) records slice."""
+        return CosseratRodWithoutDampingRecordsSlice
+
+    @staticmethod
+    def name() -> str:
+        """Obtains the name."""
+        return "CosseratRodWithoutDamping"
+
+    @staticmethod
+    def index_type() -> Type[CosseratRodWithoutDampingRecordIndex]:
+        """Obtains type of (system) index."""
+        return CosseratRodWithoutDampingRecordIndex
+
+
+CosseratRodWithoutDampingRecord.traits = CosseratRodWithoutDampingRecordTraits
+CosseratRodWithoutDampingRecords.traits = CosseratRodWithoutDampingRecordTraits
+CosseratRodWithoutDampingRecordsSlice.traits = CosseratRodWithoutDampingRecordTraits
+CosseratRodWithoutDampingRecordIndex.traits = CosseratRodWithoutDampingRecordTraits
+
+
 # Defines sphere records
 class SphereRecord(SystemRecord):
     """Sphere record type."""

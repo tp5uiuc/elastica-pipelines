@@ -24,6 +24,8 @@ from elastica_pipelines.io.protocols import SystemIndices
 from elastica_pipelines.io.protocols import name
 from elastica_pipelines.io.specialize import CosseratRodRecords
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecords
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecordTraits
 from elastica_pipelines.io.specialize import SphereRecords
 from elastica_pipelines.io.specialize import SphereRecordTraits
 from elastica_pipelines.io.typing import FuncType
@@ -108,6 +110,20 @@ class CosseratRodRecordsMixin:
         return self.__getitem__(CosseratRodRecordTraits.name())
 
 
+class CosseratRodWithoutDampingRecordsMixin:
+    """Mixin for cosserat_rods_without_damping() access."""
+
+    def cosserat_rods_without_damping(
+        self: HasGetItem,
+    ) -> CosseratRodWithoutDampingRecords:
+        """Access cosserat rod without damping records.
+
+        Returns:
+            CosseratRodWithoutDamping records.
+        """
+        return self.__getitem__(CosseratRodWithoutDampingRecordTraits.name())
+
+
 class SphereRecordsMixin:
     """Mixin for spheres() access."""
 
@@ -123,7 +139,12 @@ class SphereRecordsMixin:
 RecordsMap: TypeAlias = Mapping[str, SystemRecords]
 
 
-class Snapshot(RecordsMap, CosseratRodRecordsMixin, SphereRecordsMixin):
+class Snapshot(
+    RecordsMap,
+    CosseratRodRecordsMixin,
+    CosseratRodWithoutDampingRecordsMixin,
+    SphereRecordsMixin,
+):
     """Data access for a single snapshot of an Elastica++ simulation.
 
     Args:
