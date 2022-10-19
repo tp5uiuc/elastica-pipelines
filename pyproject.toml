@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "elastica-pipelines"
-version = "0.1.0"
+version = "0.2.0"
 description = "Elastica Pipelines"
 authors = ["ElasticaDev <tp5@illinois.edu>"]
 license = "MIT"
