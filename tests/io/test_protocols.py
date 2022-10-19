@@ -33,9 +33,9 @@ class TestElasticaConvention:
     def test_as_record_key(self, arg_type):
         """Test record key."""
         fun = ElasticaConvention.as_record_key
-        assert fun(arg_type(10)) == "000010"
-        assert fun(arg_type(100)) == "000100"
-        assert fun(arg_type(1000)) == "001000"
+        assert fun(arg_type(10)) == "0000000010"
+        assert fun(arg_type(100)) == "0000000100"
+        assert fun(arg_type(1000)) == "0000001000"
 
     def test_access(self):
         """Test access."""
