@@ -11,6 +11,23 @@ from elastica_pipelines.io.temporal import Series
 from elastica_pipelines.io.typing import FuncType
 
 
+def _check_ok(p: pathlib.Path) -> None:
+    """Check if input path is okay to read from.
+
+    Args:
+        p(Path) : path of file to choose backend.
+
+    Raises:
+        FileNotFoundError: If p does not exist.
+        OSError: If p is not a file.
+    """
+    if not p.exists():
+        raise FileNotFoundError(f"File in path {p} not found.")
+
+    if not p.is_file():
+        raise OSError(f"Path {p} is not a valid file.")
+
+
 def _choose_backend(p: pathlib.Path) -> SupportedBackends:
     """Choose backend based on file name.
 
@@ -21,14 +38,12 @@ def _choose_backend(p: pathlib.Path) -> SupportedBackends:
         Supported Backend
 
     Raises:
-        FileNotFoundError: If p does not exist.
         RuntimeError: If backend is unsupported.
     """
-    if not p.exists():
-        raise FileNotFoundError(f"File in path {p} not found.")
+    _check_ok(p)
 
     def match(suffix: str) -> bool:
-        return p.is_file() and p.suffix == suffix
+        return p.suffix == suffix
 
     if match(".h5"):
         return SupportedBackends.HDF5

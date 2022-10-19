@@ -43,6 +43,12 @@ class TestSeriesEntry:
         with pytest.raises(FileNotFoundError):
             iterate_series_metadata(metadata_file)
 
+    def test_metadata_throw_not_file(self):
+        """Test path inputs."""
+        metadata_file = THIS_DIR / "data"
+        with pytest.raises(IOError):
+            iterate_series_metadata(metadata_file)
+
     def test_metadata_throw_unsupported_backend(self):
         """Test unsupported backend."""
         metadata_file = THIS_DIR / "data" / "elastica_metadata.yml"
