@@ -13,6 +13,11 @@ from elastica_pipelines.io.specialize import CosseratRodRecordIndex
 from elastica_pipelines.io.specialize import CosseratRodRecords
 from elastica_pipelines.io.specialize import CosseratRodRecordsSlice
 from elastica_pipelines.io.specialize import CosseratRodRecordTraits
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecord
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecordIndex
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecords
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecordsSlice
+from elastica_pipelines.io.specialize import CosseratRodWithoutDampingRecordTraits
 from elastica_pipelines.io.specialize import SphereRecord
 from elastica_pipelines.io.specialize import SphereRecordIndex
 from elastica_pipelines.io.specialize import SphereRecords
@@ -116,6 +121,23 @@ def snap_node() -> Node:
             "Curvature": wrap(12.0),
         },
     }
+    cosserat_rod_without_damping_records = {
+        ElasticaConvention.as_system_key(0): {
+            "Position": wrap(2.0),
+            "Velocity": wrap(3.0),
+            "Curvature": wrap(4.0),
+        },
+        ElasticaConvention.as_system_key(1): {
+            "Position": wrap(4.0),
+            "Velocity": wrap(6.0),
+            "Curvature": wrap(8.0),
+        },
+        ElasticaConvention.as_system_key(2): {
+            "Position": wrap(6.0),
+            "Velocity": wrap(9.0),
+            "Curvature": wrap(12.0),
+        },
+    }
     sphere_records = {
         ElasticaConvention.as_system_key(0): {
             "Position": wrap(1.0),
@@ -128,6 +150,7 @@ def snap_node() -> Node:
     }
     return {
         CosseratRodRecordTraits.name(): cosserat_rod_records,
+        CosseratRodWithoutDampingRecordTraits.name(): cosserat_rod_without_damping_records,  # noqa : B950
         SphereRecordTraits.name(): sphere_records,
     }
 
@@ -143,11 +166,17 @@ class TestSnapshot:
         """
         s = Snapshot(snap_node)
 
-        assert len(s) == 2
+        assert len(s) == 3
 
         sl = s["CosseratRod"]
         assert isinstance(sl, CosseratRodRecords)
         assert sl == CosseratRodRecords(snap_node["CosseratRod"])
+
+        sl = s["CosseratRodWithoutDamping"]
+        assert isinstance(sl, CosseratRodWithoutDampingRecords)
+        assert sl == CosseratRodWithoutDampingRecords(
+            snap_node["CosseratRodWithoutDamping"]
+        )
 
         sl = s["Sphere"]
         assert isinstance(sl, SphereRecords)
@@ -179,6 +208,7 @@ class TestSnapshot:
         # There are two keys
         its = iter(s)
         assert next(its) == "CosseratRod"
+        assert next(its) == "CosseratRodWithoutDamping"
         assert next(its) == "Sphere"
 
         # Test iterator directly via yield
@@ -196,6 +226,12 @@ class TestSnapshot:
         assert isinstance(sl, CosseratRodRecords)
         assert sl == CosseratRodRecords(snap_node["CosseratRod"])
 
+        sl = s.cosserat_rods_without_damping()
+        assert isinstance(sl, CosseratRodWithoutDampingRecords)
+        assert sl == CosseratRodWithoutDampingRecords(
+            snap_node["CosseratRodWithoutDamping"]
+        )
+
         sl = s.spheres()
         assert isinstance(sl, SphereRecords)
         assert sl == SphereRecords(snap_node["Sphere"])
@@ -212,8 +248,8 @@ class TestSnapshot:
 
         sl = s.systems()
 
-        assert len(sl) == 5  # four systems in total
-        assert list(map(lambda x: x.sys_id, sl.keys())) == [0, 1, 0, 1, 2]
+        assert len(sl) == (2 + 3 + 3)  # Sphere + Two cosserat rods
+        assert list(map(lambda x: x.sys_id, sl.keys())) == [0, 1, 0, 1, 2, 0, 1, 2]
 
 
 @dataclass
@@ -349,6 +385,21 @@ class TestSeriesSelection:
         sl = sel[50]
         assert isinstance(sl, CosseratRodRecord)
         assert sl == CosseratRodRecord(series_node["000050"]["data"]["CosseratRod"], 0)
+
+        # Test without damping
+        sel = s.temporal_select(CosseratRodWithoutDampingRecordIndex([0, 1]))
+
+        # temporal
+        assert len(sel) == 3
+
+        sl = sel[50]
+        assert isinstance(sl, CosseratRodWithoutDampingRecordsSlice)
+        assert sl[0] == CosseratRodWithoutDampingRecord(
+            series_node["000050"]["data"]["CosseratRodWithoutDamping"], 0
+        )
+        assert sl[1] == CosseratRodWithoutDampingRecord(
+            series_node["000050"]["data"]["CosseratRodWithoutDamping"], 1
+        )
 
         sel = s.temporal_select(CosseratRodRecordIndex([1, 2]))
 
