@@ -1,10 +1,15 @@
 """Adding transforms to Elastica++ series."""
+import os
 from pathlib import Path
 
 from elastica_pipelines import io
 
 
 metadata_fn = Path("..") / "tests" / "io" / "data" / "elastica_metadata.h5"
+
+# Disable libhdf5 file locking since we only read files
+# This needs to be done before any import of h5py, so before reading a series
+os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 
 # Add transformations to the data using the transforms module.
 # ToArray() converts the data to a numpy array
