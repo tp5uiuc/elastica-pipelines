@@ -1,10 +1,16 @@
 """Selecting subsets of Elastica++ data and lazy loading."""
+import os
 from pathlib import Path
 
 from elastica_pipelines import io
 
 
 metadata_fn = Path("..") / "tests" / "io" / "data" / "elastica_metadata.h5"
+
+# Disable libhdf5 file locking since we only read files
+# This needs to be done before any import of h5py, so before reading a series
+os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
+
 series = io.series(metadata=metadata_fn)
 
 # Suppose we are only interested in the evolution of rods with rod_id 1, 3.
