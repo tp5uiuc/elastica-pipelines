@@ -26,11 +26,11 @@ for t, snapshot in series.iterations():
         rod,
     ) in snapshot.cosserat_rods().items():  # snapshot['CosseratRod'] also works!
         if rod_id == 0:
-            print(f"  Rod '{rod_id}' attributes:")
+            print(f"  Rod {rod_id!r} attributes:")
             # Even rod is a Mapping, so we get its keys...
             print(f"  {list(rod.keys())}")
         # and then access it values.
-        print(f"  Rod '{rod_id}' position:", rod["Position"])
+        print(f"  Rod {rod_id!r} position:", rod["Position"])
 
     # To access all rod types (CosseratRod, CosseratRodWithoutDamping etc.),
     # use the rods() method
@@ -39,4 +39,4 @@ for t, snapshot in series.iterations():
         rod,
     ) in snapshot.rods().items():
         # and then access it values.
-        print(f"  Rod '{rod_id}' position:", rod["Position"])
+        print(f"  Rod {rod_id!r} position:", rod["Position"])

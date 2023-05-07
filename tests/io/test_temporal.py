@@ -100,6 +100,8 @@ def snap_node() -> Node:
     Returns:
        node with data.
     """
+    assert 1 == 1
+
     # TODO : revisit this later on.
     def wrap(x):
         return {"data": x}

@@ -33,6 +33,6 @@ for t, snapshot in subset.iterations():
     print(f"Iteration: {t.iterate} at time {t.time}")
 
     # Use the same map interface!
-    for (rod_id, rod) in snapshot.items():
-        print(f"  Rod '{rod_id}' elements:")
+    for rod_id, rod in snapshot.items():
+        print(f"  Rod {rod_id!r} elements:")
         print("  Rod elements:", rod["NElement"])
