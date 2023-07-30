@@ -23,7 +23,7 @@ except ImportError:
 
 
 package = "elastica_pipelines"
-python_versions = ["3.10", "3.9", "3.8", "3.7"]
+python_versions = ["3.11", "3.10", "3.9", "3.8"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
@@ -142,19 +142,19 @@ def precommit(session: Session) -> None:
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     requirements = session.poetry.export_requirements()
-    # Vulnerabilities with numpy 1.21 needed for Python 3.7 support
-    ignored = (
-        44715,
-        44716,
-        44717,
-    )
+    # # Vulnerabilities with numpy 1.21 needed for Python 3.7 support
+    # ignored = (
+    #     44715,
+    #     44716,
+    #     44717,
+    # )
     session.install("safety")
     session.run(
         "safety",
         "check",
         "--full-report",
         f"--file={requirements}",
-        *map(lambda x: f"--ignore={x}", ignored),
+        # *map(lambda x: f"--ignore={x}", ignored),
     )
 
 
